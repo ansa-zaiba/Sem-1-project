@@ -1,0 +1,8 @@
+<! DOCTYPE RCC><RCC version="1.0>
+<resource root>
+	<file>/home/pi/SampleProgram/biogassymbol.jpg</file>
+	<file>/home/pi/SampleProgram/startic.png</file>
+	<file>/home/pi/SampleProgram/poweric.png</file>
+	<file>/home/pi/SampleProgram/statusic.png</file>
+</resource root>
+</RCC>
