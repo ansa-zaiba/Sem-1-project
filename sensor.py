@@ -6,6 +6,7 @@ import time
 import datetime
 import MySQLdb
 from time import strftime
+<<<<<<< HEAD
 import requests
 import json
 import random
@@ -15,7 +16,7 @@ def measure_temperature():
 
     GPIO.setmode(GPIO.BCM)
     TEMP = 21
-    
+
 
     print "Temperature Measurement in progress"
 
@@ -31,8 +32,10 @@ def measure_temperature():
                 
     else:
             print "Waiting For Sensor To Settle"
+
             temperature = int(random.gauss(27,0.9))
-            time.sleep(2)
+
+    time.sleep(2)
 
     return temperature
 
@@ -67,7 +70,6 @@ def write_to_db():
         cur.close()
         db.close()
         
-        
     return temperature
 
 def write_to_cloud():
@@ -86,7 +88,9 @@ def write_to_cloud():
         #current time and date
         timeWrite = time.strftime('%H:%M:%S')
         dateWrite = time.strftime('%d/%m/%Y')
+
         print (str(temperature) + ',' + timeWrite + ',' + dateWrite)
+
         #insert record
         data = {'Date':dateWrite,'Time':timeWrite,'Value':temperature}
         result = requests.post(firebase_url + '/distance.json', data=json.dumps(data))

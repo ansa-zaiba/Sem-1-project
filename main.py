@@ -20,6 +20,7 @@ class MainWindow(QtWidgets.QMainWindow, mainwindow_auto.Ui_MainWindow):
         os.system('python /home/pi/SampleProgram/sensor.py')
 
     def pressedOffButton(self):
+
         os.system('sudo shutdown now -h')
 
     def pressedStatButton(self):
