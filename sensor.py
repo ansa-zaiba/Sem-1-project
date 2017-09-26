@@ -82,7 +82,7 @@ def write_to_cloud():
     print ("")
     print ("")
     print (temperature)
-    firebase_url = 'https://biogas-monitoring.firebaseio.com/'
+    firebase_url = 'https://istarmcs-997b1.firebaseio.com/'
 
     try:
         #current time and date
