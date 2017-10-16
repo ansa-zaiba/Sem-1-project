@@ -18,7 +18,7 @@ def measure_temperature(sensor):
 ##    TEMP = 21
 
 
-    print "Temperature Measurement in progress"
+##    print "Temperature Measurement in progress"
 
 ##    GPIO.setup(TEMP,GPIO.IN)
     temperature=sensor.get_temperature()
@@ -32,29 +32,18 @@ def measure_temperature(sensor):
 
     return temperature
 
-def write_to_db(sensor):
+def write_to_db(cur,sensor):
     # Get data from sensor
     temperature = measure_temperature(sensor)
-    print "Content-type:text/html\r\n\r\n"
-    print ""
-    print ""
-    print "Data Storage"
-    print ""
-    print "" 
-    print temperature
   
     #Code to write the recorded temperature in the MYSQL database 'temperature_measurement' and table 'temperature_at_all_times'
 ##    db = MySQLdb.connect(host= "127.0.0.1",port= 3306,user= "root",passwd= "sangan",db= "temperature_measurement")
-    db=sqlite3.connect('/home/pi/SampleProgram/data.db')
-    cur = db.cursor()
     
     dateWrite = time.strftime("%Y-%m-%d")
     timeWrite = time.strftime("%H:%M:%S")
     try:
         cur.execute("INSERT INTO 'temperature' ('DATE', 'TIME', 'TEMPERATURE') VALUES (?,?,?)", (dateWrite,timeWrite,temperature))
         db.commit()
-        result= cur.fetchone()
-        print db
         print "\nProcess finished"
     except e:
         print e
@@ -65,9 +54,9 @@ def write_to_db(sensor):
         
     return temperature
 
-def write_to_cloud(sensor):
+def write_to_cloud(temperature):
     # Get data from server
-    temperature = write_to_db(sensor)
+    
   
     print ("Content-type:text/html\r\n\r\n")
     print ("")
@@ -96,12 +85,26 @@ def write_to_cloud(sensor):
 
 if __name__ == '__main__':
     sensor = W1ThermSensor()
+    db=sqlite3.connect('/home/pi/SampleProgram/data.db')
+    cur = db.cursor()
+    db.execute('delete from temperature')
+    db.commit()
     try:
+        time1=float(0.0)
+        last_temperature=float(0)
         while True:
-                finaltemp = write_to_cloud(sensor)
-                print "finaltemp", finaltemp
-                time.sleep(10)
+            temperature = write_to_db(cur,sensor)
+            if (time.time()-time1>60) or (temperature-last_temperature>1):
+                time1=time.time()
+                print(time1)
+                print "\n\n###########\n\n"
+                write_to_cloud(temperature)
+                last_temperature=temperature
+                print "\n\n*************\n\n"
+            print "finaltemp", temperature
+            
                 
-    finally: GPIO.cleanup()
-
+    finally: 
+        GPIO.cleanup()
+        db.close()
     
