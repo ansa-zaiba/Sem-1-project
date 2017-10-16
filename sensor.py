@@ -1,4 +1,4 @@
-#!usr/bin/python
+#!usr/bin/python3
 import RPi.GPIO as GPIO
 import cgi, cgitb
 import os
@@ -6,42 +6,35 @@ import time
 import datetime
 import MySQLdb
 from time import strftime
-<<<<<<< HEAD
+from w1thermsensor import W1ThermSensor
 import requests
 import json
 import random
 import sqlite3
 
-def measure_temperature():
+def measure_temperature(sensor):
 
-    GPIO.setmode(GPIO.BCM)
-    TEMP = 21
+##    GPIO.setmode(GPIO.BCM)
+##    TEMP = 21
 
 
     print "Temperature Measurement in progress"
 
-    GPIO.setup(TEMP,GPIO.IN)
-
-    if GPIO.input(TEMP):
-
-            while GPIO.input(TEMP)>0:
-
-                temperature = (TEMP-2.370)/2.12
-                temperature = round(temperature, 2)
-                print "Temperature:",temperature,"C"
+##    GPIO.setup(TEMP,GPIO.IN)
+    temperature=sensor.get_temperature()
                 
-    else:
-            print "Waiting For Sensor To Settle"
-
-            temperature = int(random.gauss(27,0.9))
+##    else:
+##            print "Waiting For Sensor To Settle"
+##
+##            temperature = int(random.gauss(27,0.9))
 
     time.sleep(2)
 
     return temperature
 
-def write_to_db():
+def write_to_db(sensor):
     # Get data from sensor
-    temperature = measure_temperature()
+    temperature = measure_temperature(sensor)
     print "Content-type:text/html\r\n\r\n"
     print ""
     print ""
@@ -72,9 +65,10 @@ def write_to_db():
         
     return temperature
 
-def write_to_cloud():
-  # Get data from server
-    temperature = write_to_db()
+def write_to_cloud(sensor):
+    # Get data from server
+    temperature = write_to_db(sensor)
+  
     print ("Content-type:text/html\r\n\r\n")
     print ("")
     print ("")
@@ -85,24 +79,26 @@ def write_to_cloud():
     firebase_url = 'https://istarmcs-997b1.firebaseio.com/'
 
     try:
+        
         #current time and date
         timeWrite = time.strftime('%H:%M:%S')
         dateWrite = time.strftime('%d/%m/%Y')
 
-        print (str(temperature) + ',' + timeWrite + ',' + dateWrite)
+        print (str(temperature)+ ',' + timeWrite + ',' + dateWrite)
 
         #insert record
         data = {'Date':dateWrite,'Time':timeWrite,'Value':temperature}
-        result = requests.post(firebase_url + '/distance.json', data=json.dumps(data))
-        print ('Record inserted. Result Code = ' + str(result.status_code) + ',' + result.text)
+        result = requests.post(firebase_url+'/temperature.json', data=json.dumps(data))
+        print 'Record inserted. Result Code = ' + str(result.status_code) + ',' + result.text
         
     except IOError:
         print('Error! Something went wrong.')
 
 if __name__ == '__main__':
+    sensor = W1ThermSensor()
     try:
         while True:
-                finaltemp = write_to_cloud()
+                finaltemp = write_to_cloud(sensor)
                 print "finaltemp", finaltemp
                 time.sleep(10)
                 
