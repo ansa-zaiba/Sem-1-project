@@ -94,7 +94,7 @@ if __name__ == '__main__':
         last_temperature=float(0)
         while True:
             temperature = write_to_db(cur,sensor)
-            if (time.time()-time1>60) or (temperature-last_temperature>1):
+            if (time.time()-time1>60) or (abs(temperature-last_temperature)>1):
                 time1=time.time()
                 print(time1)
                 print "\n\n###########\n\n"
