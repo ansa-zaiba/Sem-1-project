@@ -43,13 +43,16 @@ class MainWindow(QtWidgets.QMainWindow, ui_mainwindow2.Ui_MainWindow):
     def readTemp(self):
         db=sqlite3.connect('/home/pi/SampleProgram/data.db')
         while True:
-            min_row=db.execute('select min(oid) from temperature').fetchone()[0]
-            max_row=db.execute('select max(oid) from temperature').fetchone()[0]
-            if (max_row-min_row)>3600:
-                db.execute('delete from temperature where oid<max_row')
-            current_temp=db.execute('select temperature from temperature where oid=(?)',[max_row]).fetchone()[0]
-            self.temp.display(current_temp)
-            db.commit()
+            try:
+                min_row=db.execute('select min(oid) from temperature').fetchone()[0]
+                max_row=db.execute('select max(oid) from temperature').fetchone()[0]
+                if (max_row-min_row)>3600:
+                    db.execute('delete from temperature where oid<max_row')
+                current_temp=db.execute('select temperature from temperature where oid=(?)',[max_row]).fetchone()[0]
+                self.temp.display(current_temp)
+                db.commit()
+            except:
+                continue
             
 
 

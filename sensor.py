@@ -11,6 +11,7 @@ import requests
 import json
 import random
 import sqlite3
+import cyberoam
 
 def measure_temperature(sensor):
 
@@ -27,9 +28,7 @@ def measure_temperature(sensor):
 ##            print "Waiting For Sensor To Settle"
 ##
 ##            temperature = int(random.gauss(27,0.9))
-
     time.sleep(2)
-
     return temperature
 
 def write_to_db(cur,sensor):
@@ -81,7 +80,8 @@ def write_to_cloud(temperature):
         print 'Record inserted. Result Code = ' + str(result.status_code) + ',' + result.text
         
     except IOError:
-        print('Error! Something went wrong.')
+	cyberoam.login()
+        print 'Error! Something went wrong.'
 
 if __name__ == '__main__':
     sensor = W1ThermSensor()
@@ -89,6 +89,7 @@ if __name__ == '__main__':
     cur = db.cursor()
     db.execute('delete from temperature')
     db.commit()
+    cyberoam.login()
     try:
         time1=float(0.0)
         last_temperature=float(0)
